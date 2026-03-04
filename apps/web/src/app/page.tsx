@@ -43,7 +43,7 @@ export default function LandingPage() {
             <div className="w-3 h-3 rounded-full bg-green-500"></div>
           </div>
           <pre className="text-neutral-300">
-            <code className="block text-green-400 mb-2">// Deploy to multiple chains in one command</code>
+            <code className="block text-green-400 mb-2">{"// Deploy to multiple chains in one command"}</code>
             <code className="block"><span className="text-blue-400">orvyn</span> deploy MyToken.rs --targets <span className="text-orange-400">ethereum,solana</span></code>
             <code className="block text-neutral-500 mt-2">→ Compiling standard Rust... [64ms]</code>
             <code className="block text-neutral-500">→ Generating EVM Bytecode... [12ms]</code>

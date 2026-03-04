@@ -4,7 +4,7 @@ import { useEditorStore } from '@/stores/editorStore';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { useCallback } from 'react';
 
-export default function EditorPage({ params }: { params: { id: string } }) {
+export default function EditorPage() {
     const { status, setStatus, logs, clearLogs, appendLog } = useEditorStore();
     const { send } = useWebSocket('ws://localhost:8080/ws');
 

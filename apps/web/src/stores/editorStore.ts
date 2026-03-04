@@ -9,8 +9,8 @@ export interface EditorState {
     setStatus: (status: CompileStatus) => void;
     errors: string[];
     setErrors: (errors: string[]) => void;
-    artifacts: Record<string, any> | null;
-    setArtifacts: (artifacts: Record<string, any>) => void;
+    artifacts: Record<string, unknown> | null;
+    setArtifacts: (artifacts: Record<string, unknown>) => void;
     logs: string[];
     appendLog: (log: string) => void;
     clearLogs: () => void;

@@ -1,6 +1,4 @@
 use orvyn_compiler::SolidityCompiler;
-use orvyn_core::traits::Compiler;
-use orvyn_core::types::CompileJob;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
@@ -18,7 +16,7 @@ async fn main() -> anyhow::Result<()> {
     // In a real scenario, this would be a worker loop consuming from a queue.
     // For this phase, we'll demonstrate that the compiler crate works.
 
-    let compiler = SolidityCompiler;
+    let _compiler = SolidityCompiler;
 
     tracing::info!("Compiler Service ready.");
 

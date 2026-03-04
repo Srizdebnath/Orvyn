@@ -7,6 +7,8 @@ export const useWebSocket = (url: string) => {
     const socketRef = useRef<WebSocket | null>(null);
     const { appendLog, setStatus } = useEditorStore();
 
+    const connectRef = useRef<() => void>(undefined);
+
     const connect = useCallback(() => {
         if (socketRef.current?.readyState === WebSocket.OPEN) return;
 
@@ -32,7 +34,11 @@ export const useWebSocket = (url: string) => {
         socket.onclose = () => {
             console.log('Disconnected from Orvyn WebSocket');
             // Reconnect after 3 seconds
-            setTimeout(connect, 3000);
+            setTimeout(() => {
+                if (socketRef.current?.readyState !== WebSocket.OPEN) {
+                    connectRef.current?.();
+                }
+            }, 3000);
         };
 
         socket.onerror = (error) => {
@@ -41,13 +47,17 @@ export const useWebSocket = (url: string) => {
     }, [url, appendLog, setStatus]);
 
     useEffect(() => {
+        connectRef.current = connect;
+    }, [connect]);
+
+    useEffect(() => {
         connect();
         return () => {
             socketRef.current?.close();
         };
     }, [connect]);
 
-    const send = useCallback((message: any) => {
+    const send = useCallback((message: Record<string, unknown>) => {
         if (socketRef.current?.readyState === WebSocket.OPEN) {
             socketRef.current.send(JSON.stringify(message));
         } else {
