@@ -42,124 +42,133 @@ export default function DashboardPage() {
     };
 
     return (
-        <div className="min-h-screen bg-neutral-950 text-white flex">
+        <div className="min-h-screen text-white flex p-8 gap-8 relative overflow-x-hidden">
+            {/* Widgets Layer (for consistency with landing) */}
+            <div className="fixed bottom-8 left-8 flex flex-col gap-4 z-50 pointer-events-none">
+                {/* 1 Issue Widget */}
+                <div className="px-5 py-3.5 rounded-xl bg-[#111111]/60 backdrop-blur-[20px] border border-white/10 shadow-2xl flex items-center gap-3 pointer-events-auto">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]"></div>
+                    <span className="text-sm font-semibold tracking-wide">1 Issue</span>
+                </div>
+            </div>
+
             {/* Sidebar */}
-            <aside className="w-64 border-r border-neutral-800 bg-neutral-900/30 p-6 flex flex-col gap-8">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center font-bold text-white shadow-lg shadow-orange-500/20">
+            <aside className="w-72 rounded-[2rem] border border-white/10 bg-[#111111]/60 backdrop-blur-[20px] p-8 flex flex-col gap-10 shadow-2xl h-[calc(100vh-4rem)] sticky top-8">
+                <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center font-bold text-white shadow-lg shadow-orange-500/20 text-xl">
                         O
                     </div>
-                    <span className="text-xl font-bold tracking-tight text-white">Orvyn</span>
+                    <span className="text-2xl font-bold tracking-tight text-white display-font">Orvyn</span>
                 </div>
 
                 <nav className="flex flex-col gap-2">
-                    <div className="px-3 py-2 text-sm font-medium text-white bg-white/10 rounded-lg">Projects</div>
-                    <div className="px-3 py-2 text-sm font-medium text-neutral-400 hover:text-white hover:bg-white/5 rounded-lg cursor-pointer transition-colors">Templates</div>
-                    <div className="px-3 py-2 text-sm font-medium text-neutral-400 hover:text-white hover:bg-white/5 rounded-lg cursor-pointer transition-colors">History</div>
-                    <div className="px-3 py-2 text-sm font-medium text-neutral-400 hover:text-white hover:bg-white/5 rounded-lg cursor-pointer transition-colors">Settings</div>
+                    <div className="px-4 py-3 text-sm font-bold text-white bg-white/10 rounded-xl border border-white/5">Projects</div>
+                    <div className="px-4 py-3 text-sm font-medium text-neutral-400 hover:text-white hover:bg-white/5 rounded-xl cursor-pointer transition-all border border-transparent hover:border-white/5">Templates</div>
+                    <div className="px-4 py-3 text-sm font-medium text-neutral-400 hover:text-white hover:bg-white/5 rounded-xl cursor-pointer transition-all border border-transparent hover:border-white/5">History</div>
+                    <div className="px-4 py-3 text-sm font-medium text-neutral-400 hover:text-white hover:bg-white/5 rounded-xl cursor-pointer transition-all border border-transparent hover:border-white/5">Settings</div>
                 </nav>
 
-                <div className="mt-auto p-4 rounded-xl border border-neutral-800 bg-neutral-900/50">
-                    <div className="text-sm font-medium mb-2">Free Tier</div>
-                    <div className="text-xs text-neutral-400 mb-3">2/3 chains unlocked</div>
-                    <div className="w-full h-2 bg-neutral-800 rounded-full overflow-hidden">
-                        <div className="h-full w-2/3 bg-orange-500 rounded-full"></div>
+                <div className="mt-auto p-6 rounded-2xl border border-white/10 bg-white/5 shadow-inner">
+                    <div className="text-sm font-bold mb-2">Free Tier</div>
+                    <div className="text-xs text-neutral-400 mb-4">2/3 chains unlocked</div>
+                    <div className="w-full h-2.5 bg-neutral-800 rounded-full overflow-hidden">
+                        <div className="h-full w-2/3 bg-orange-500 rounded-full shadow-[0_0_10px_rgba(249,115,22,0.5)]"></div>
                     </div>
-                    <button className="mt-4 w-full text-xs font-semibold text-orange-400 hover:text-orange-300 transition-colors">
+                    <button className="mt-5 w-full text-xs font-bold text-orange-400 hover:text-orange-300 transition-colors uppercase tracking-widest">
                         Upgrade to Pro &rarr;
                     </button>
                 </div>
             </aside>
 
             {/* Main Content */}
-            <main className="flex-1 p-10 overflow-y-auto">
-                <div className="max-w-5xl mx-auto space-y-10">
-                    <div className="flex items-center justify-between">
-                        <h1 className="text-3xl font-bold tracking-tight">My Projects</h1>
-                        <Link
-                            href="/editor/new"
-                            className="px-4 py-2 bg-orange-500 hover:bg-orange-600 rounded-lg font-medium text-sm transition-colors shadow-lg shadow-orange-500/20"
-                        >
-                            + New Project
+            <main className="flex-1 space-y-10 animate-in fade-in duration-700">
+                <div className="flex items-center justify-between p-8 rounded-[2rem] bg-[#111111]/60 backdrop-blur-[20px] border border-white/10 shadow-2xl">
+                    <h1 className="text-4xl font-bold tracking-tight text-white display-font">My <span className="text-orange-500">Projects</span></h1>
+                    <Link
+                        href="/editor/new"
+                        className="px-8 py-3 bg-orange-500 hover:bg-orange-600 rounded-xl font-bold text-sm transition-all shadow-[0_0_25px_-5px_rgba(249,115,22,0.4)] active:scale-95"
+                    >
+                        + New Project
+                    </Link>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {loading ? (
+                        <div className="col-span-full py-20 text-center rounded-[2rem] bg-[#111111]/40 backdrop-blur-md border border-white/5 text-neutral-500 italic">
+                            Loading your workspace...
+                        </div>
+                    ) : projects.length === 0 ? (
+                        <div className="col-span-full py-32 border-2 border-dashed border-white/10 rounded-[2.5rem] bg-[#111111]/40 backdrop-blur-md flex flex-col items-center justify-center text-center p-10 shadow-2xl">
+                            <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-6 text-neutral-400 border border-white/5">
+                                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                            </div>
+                            <h3 className="text-2xl font-bold text-white mb-2">No Projects Yet</h3>
+                            <p className="text-neutral-400 mb-8 max-w-sm">Start your first multi-chain contract by creating a new project.</p>
+                            <Link href="/editor/new" className="px-10 py-4 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded-xl hover:bg-orange-500 hover:text-white transition-all font-bold text-lg">Create First Project</Link>
+                        </div>
+                    ) : projects.map((project) => (
+                        <Link key={project.id} href={`/editor/${project.id}`} className="block group">
+                            <div className="p-8 rounded-[2rem] bg-[#111111]/60 backdrop-blur-[20px] border border-white/10 hover:border-orange-500/50 transition-all shadow-2xl h-full relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div className="text-orange-500">
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div className="flex items-start justify-between mb-6">
+                                    <div className="w-12 h-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 font-bold text-xl shadow-inner">
+                                        {project.name.charAt(0)}
+                                    </div>
+                                    <span className="px-3 py-1 rounded-full text-[10px] font-bold bg-green-500/10 text-green-400 border border-green-500/20 uppercase tracking-widest shadow-inner">
+                                        Ready
+                                    </span>
+                                </div>
+                                <h3 className="text-2xl font-bold mb-2 group-hover:text-orange-400 transition-colors uppercase tracking-tight text-white">{project.name}</h3>
+                                <p className="text-sm text-neutral-400 mb-8 line-clamp-2 leading-relaxed">{project.description || "Multi-chain contract project."}</p>
+                                <div className="mt-auto flex items-center justify-between text-[11px] text-neutral-500 font-mono border-t border-white/5 pt-6">
+                                    <span className="flex items-center gap-2 text-neutral-300 font-bold">
+                                        <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]"></div>
+                                        {project.main_chain}
+                                    </span>
+                                    <span className="bg-white/5 px-2 py-1 rounded border border-white/5">{formatTimeAgo(project.created_at)}</span>
+                                </div>
+                            </div>
                         </Link>
-                    </div>
+                    ))}
+                </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {loading ? (
-                            <div className="col-span-full py-12 text-center text-neutral-500 italic">Loading projects...</div>
-                        ) : projects.length === 0 ? (
-                            <div className="col-span-full py-24 border-2 border-dashed border-neutral-800 rounded-3xl flex flex-col items-center justify-center text-center">
-                                <div className="w-16 h-16 rounded-full bg-neutral-900 flex items-center justify-center mb-4 text-neutral-600">
-                                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                    </svg>
+                <div className="p-8 rounded-[2rem] bg-[#111111]/60 backdrop-blur-[20px] border border-white/10 shadow-2xl">
+                    <h2 className="text-2xl font-bold tracking-tight mb-8 flex items-center gap-4 text-white">
+                        <span className="w-12 h-px bg-white/20"></span>
+                        Recent Deployments
+                    </h2>
+                    <div className="grid grid-cols-1 gap-4">
+                        <div className="flex items-center justify-between p-6 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all group">
+                            <div>
+                                <div className="font-bold text-lg flex items-center gap-3 text-white mb-1">
+                                    MyToken &rarr; Ethereum
+                                    <span className="text-[10px] px-2.5 py-1 rounded-full bg-green-500/20 text-green-400 border border-green-500/30 flex items-center gap-2 font-bold uppercase tracking-widest shadow-inner">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> Verified
+                                    </span>
                                 </div>
-                                <h3 className="text-xl font-bold text-neutral-300">No Projects Yet</h3>
-                                <p className="text-neutral-500 mt-2 mb-6 max-w-xs">Start your first multi-chain contract by creating a new project.</p>
-                                <Link href="/editor/new" className="px-6 py-2 bg-orange-500/10 text-orange-500 border border-orange-500/20 rounded-xl hover:bg-orange-500 hover:text-white transition-all font-medium">Create Project</Link>
+                                <div className="text-xs text-neutral-500 mt-1 font-mono group-hover:text-neutral-400 transition-colors">0x1234...abcd</div>
                             </div>
-                        ) : projects.map((project) => (
-                            <Link key={project.id} href={`/editor/${project.id}`} className="block group">
-                                <div className="p-6 rounded-2xl bg-neutral-900/50 border border-neutral-800 hover:border-orange-500/50 transition-all group relative overflow-hidden h-full">
-                                    <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <div className="text-orange-500">
-                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                            </svg>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 font-bold">
-                                            {project.name.charAt(0)}
-                                        </div>
-                                        <span className="px-2 py-1 rounded text-[10px] font-bold bg-green-400/10 text-green-400 border border-green-400/20 uppercase tracking-wider">
-                                            Ready
-                                        </span>
-                                    </div>
-                                    <h3 className="text-lg font-bold mb-1 group-hover:text-orange-400 transition-colors uppercase tracking-tight">{project.name}</h3>
-                                    <p className="text-sm text-neutral-400 mb-6 line-clamp-2">{project.description || "Multi-chain contract project."}</p>
-                                    <div className="mt-auto flex items-center justify-between text-[11px] text-neutral-500 font-mono border-t border-neutral-800/50 pt-4">
-                                        <span className="flex items-center gap-1.5 text-neutral-400">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                                            {project.main_chain}
-                                        </span>
-                                        <span>{formatTimeAgo(project.created_at)}</span>
-                                    </div>
+                            <div className="text-xs text-neutral-400 font-bold border border-white/5 px-3 py-1.5 rounded-lg bg-black/20">2 days ago</div>
+                        </div>
+                        <div className="flex items-center justify-between p-6 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-all group">
+                            <div>
+                                <div className="font-bold text-lg flex items-center gap-3 text-white mb-1">
+                                    MyToken &rarr; Solana
+                                    <span className="text-[10px] px-2.5 py-1 rounded-full bg-[#333333] text-neutral-400 border border-white/5 flex items-center gap-2 font-bold uppercase tracking-widest">
+                                        Pending
+                                    </span>
                                 </div>
-                            </Link>
-                        ))}
-                    </div>
-
-                    <div className="pt-4">
-                        <h2 className="text-xl font-bold tracking-tight mb-6 flex items-center gap-3">
-                            <span className="w-8 h-px bg-neutral-800"></span>
-                            Recent Deployments
-                        </h2>
-                        <div className="border border-neutral-800 rounded-2xl overflow-hidden bg-neutral-900/10 backdrop-blur-sm">
-                            <div className="flex items-center justify-between p-4 border-b border-neutral-800 hover:bg-neutral-800/20 transition-colors">
-                                <div>
-                                    <div className="font-medium flex items-center gap-2">
-                                        MyToken &rarr; Ethereum
-                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 flex items-center gap-1 font-bold uppercase tracking-tighter">
-                                            <span className="w-1 h-1 rounded-full bg-green-400 animate-pulse"></span> Verified
-                                        </span>
-                                    </div>
-                                    <div className="text-xs text-neutral-500 mt-1 font-mono text-white/40">0x1234...abcd</div>
-                                </div>
-                                <div className="text-xs text-neutral-500">2 days ago</div>
+                                <div className="text-xs text-neutral-500 mt-1 font-mono group-hover:text-neutral-400 transition-colors">AaBb...XxYy</div>
                             </div>
-                            <div className="flex items-center justify-between p-4 hover:bg-neutral-800/20 transition-colors text-neutral-400 grayscale opacity-70 border-b border-neutral-800">
-                                <div>
-                                    <div className="font-medium flex items-center gap-2">
-                                        MyToken &rarr; Solana
-                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-neutral-800 text-neutral-500 border border-neutral-700 flex items-center gap-1 font-bold uppercase tracking-tighter">
-                                            Pending
-                                        </span>
-                                    </div>
-                                    <div className="text-xs text-neutral-500 mt-1 font-mono">AaBb...XxYy</div>
-                                </div>
-                                <div className="text-xs text-neutral-500 text-white/20">2 days ago</div>
-                            </div>
+                            <div className="text-xs text-neutral-400 font-bold border border-white/5 px-3 py-1.5 rounded-lg bg-black/20">2 days ago</div>
                         </div>
                     </div>
                 </div>
