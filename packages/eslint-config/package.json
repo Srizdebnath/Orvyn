@@ -1,0 +1,14 @@
+{
+    "name": "@orvyn/eslint-config",
+    "version": "0.0.0",
+    "private": true,
+    "files": [
+        "next.js",
+        "react-internal.js",
+        "library.js"
+    ],
+    "peerDependencies": {
+        "eslint": "^8.0.0",
+        "prettier": "^3.0.0"
+    }
+}
