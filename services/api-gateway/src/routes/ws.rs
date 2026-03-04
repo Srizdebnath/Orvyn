@@ -1,15 +1,20 @@
+use crate::state::AppState;
 use axum::{
-    extract::ws::{Message, WebSocket, WebSocketUpgrade},
+    extract::{
+        State,
+        ws::{Message, WebSocket, WebSocketUpgrade},
+    },
     response::IntoResponse,
 };
 use serde_json::json;
+use sqlx::Row;
 use std::time::Duration;
 
-pub async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
-    ws.on_upgrade(|socket| handle_socket(socket))
+pub async fn ws_handler(ws: WebSocketUpgrade, State(state): State<AppState>) -> impl IntoResponse {
+    ws.on_upgrade(|socket| handle_socket(socket, state))
 }
 
-async fn handle_socket(mut socket: WebSocket) {
+async fn handle_socket(mut socket: WebSocket, state: AppState) {
     tracing::info!("New WebSocket connection");
 
     while let Some(msg) = socket.recv().await {
@@ -17,11 +22,14 @@ async fn handle_socket(mut socket: WebSocket) {
             match msg {
                 Message::Text(text) => {
                     tracing::debug!("Received text: {}", text);
-                    // Assume client sends a JSON like {"action": "subscribe", "job_id": "..."}
                     if let Ok(val) = serde_json::from_str::<serde_json::Value>(&text) {
                         if val["action"] == "subscribe" {
-                            let job_id = val["job_id"].as_str().unwrap_or("unknown");
-                            stream_mock_progress(&mut socket, job_id).await;
+                            if let Some(job_id_str) = val["job_id"].as_str() {
+                                if let Ok(job_id) = uuid::Uuid::parse_str(job_id_str) {
+                                    stream_build_progress(socket, state, job_id).await;
+                                    return;
+                                }
+                            }
                         }
                     }
                 }
@@ -32,35 +40,75 @@ async fn handle_socket(mut socket: WebSocket) {
                 _ => {}
             }
         } else {
-            tracing::error!("WebSocket error");
             break;
         }
     }
 }
 
-async fn stream_mock_progress(socket: &mut WebSocket, job_id: &str) {
-    let stages = vec![
-        ("parsing", "Parsing Rust source code..."),
-        ("ir_gen", "Generating LLVM Intermediate Representation..."),
-        ("optimize", "Running optimization passes..."),
-        ("codegen_evm", "Generating EVM Bytecode..."),
-        ("codegen_solana", "Generating Solana BPF..."),
-        ("finalizing", "Uploading artifacts to storage..."),
-        ("done", "Compilation successful!"),
-    ];
+async fn stream_build_progress(mut socket: WebSocket, state: AppState, job_id: uuid::Uuid) {
+    let mut last_status = String::new();
 
-    for (stage, msg) in stages {
-        tokio::time::sleep(Duration::from_millis(800)).await;
-        let event = json!({
-            "type": "progress",
-            "job_id": job_id,
-            "stage": stage,
-            "message": msg,
-            "timestamp": chrono::Utc::now().to_rfc3339()
-        });
+    loop {
+        let build =
+            sqlx::query("SELECT status, artifacts, error_message FROM builds WHERE id = $1")
+                .bind(job_id)
+                .fetch_optional(&state.db)
+                .await;
 
-        if socket.send(Message::Text(event.to_string())).await.is_err() {
-            break;
+        match build {
+            Ok(Some(row)) => {
+                let status: String = row.get("status");
+
+                if status != last_status {
+                    last_status = status.clone();
+                    let msg = json!({
+                        "type": "progress",
+                        "stage": status,
+                        "message": format!("Build status updated: {}", status),
+                        "job_id": job_id.to_string()
+                    });
+
+                    if socket.send(Message::Text(msg.to_string())).await.is_err() {
+                        break;
+                    }
+
+                    if status == "completed" || status == "failed" {
+                        if status == "completed" {
+                            let artifacts: serde_json::Value = row.get("artifacts");
+                            let _ = socket
+                                .send(Message::Text(
+                                    json!({
+                                        "type": "completed",
+                                        "artifacts": artifacts
+                                    })
+                                    .to_string(),
+                                ))
+                                .await;
+                        } else {
+                            let error: Option<String> = row.get("error_message");
+                            let _ = socket
+                                .send(Message::Text(
+                                    json!({
+                                        "type": "failed",
+                                        "error": error
+                                    })
+                                    .to_string(),
+                                ))
+                                .await;
+                        }
+                        break;
+                    }
+                }
+            }
+            Ok(None) => {
+                // Job not found yet, maybe wait?
+            }
+            Err(e) => {
+                tracing::error!("DB error in WS stream: {}", e);
+                break;
+            }
         }
+
+        tokio::time::sleep(Duration::from_millis(1000)).await;
     }
 }

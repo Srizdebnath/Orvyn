@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import CodeEditor from '@/components/editor/CodeEditor';
 import { useEditorStore } from '@/stores/editorStore';

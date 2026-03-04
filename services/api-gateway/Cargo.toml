@@ -14,7 +14,10 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 anyhow = { workspace = true }
 orvyn-core = { path = "../../crates/orvyn-core" }
 orvyn-compiler = { path = "../../crates/orvyn-compiler" }
-chrono = "0.4.44"
+chrono = { workspace = true, features = ["serde"] }
 uuid = { workspace = true }
+redis = { workspace = true }
+sqlx = { workspace = true }
+dotenvy = { workspace = true }
 thiserror = { workspace = true }
 futures = "0.3"

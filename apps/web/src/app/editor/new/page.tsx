@@ -29,10 +29,26 @@ export default function NewProjectPage() {
     });
 
     const onSubmit = async (data: ProjectFormValues) => {
-        // Mock API call to create project
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        console.log('Project created:', data);
-        router.push('/editor/new-project-id');
+        try {
+            const response = await fetch('http://localhost:8080/api/v1/projects', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: data.name,
+                    description: data.description,
+                    template: data.template,
+                    main_chain: data.template === 'spl' ? 'Solana' : 'Ethereum',
+                }),
+            });
+
+            if (!response.ok) throw new Error('Failed to create project');
+
+            const result = await response.json();
+            router.push(`/editor/${result.id}`);
+        } catch (err) {
+            console.error(err);
+            alert('Failed to create project. Please ensure the backend is running.');
+        }
     };
 
     return (

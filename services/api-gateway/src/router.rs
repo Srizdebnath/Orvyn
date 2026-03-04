@@ -29,4 +29,9 @@ fn api_routes() -> Router<AppState> {
             "/deploy",
             axum::routing::post(routes::deploy::deploy_contract),
         )
+        .route(
+            "/projects",
+            axum::routing::get(routes::projects::list_projects)
+                .post(routes::projects::create_project),
+        )
 }
