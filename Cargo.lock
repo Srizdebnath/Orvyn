@@ -34,6 +34,7 @@ dependencies = [
  "axum",
  "chrono",
  "futures",
+ "orvyn-compiler",
  "orvyn-core",
  "serde",
  "serde_json",
@@ -213,6 +214,14 @@ dependencies = [
 [[package]]
 name = "compiler-service"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "orvyn-compiler",
+ "orvyn-core",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
 
 [[package]]
 name = "core-foundation-sys"
@@ -684,6 +693,16 @@ version = "0.1.0"
 [[package]]
 name = "orvyn-compiler"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "orvyn-core",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+ "tracing",
+]
 
 [[package]]
 name = "orvyn-core"
