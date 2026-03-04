@@ -11,6 +11,9 @@ export interface EditorState {
     setErrors: (errors: string[]) => void;
     artifacts: Record<string, any> | null;
     setArtifacts: (artifacts: Record<string, any>) => void;
+    logs: string[];
+    appendLog: (log: string) => void;
+    clearLogs: () => void;
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
@@ -41,4 +44,7 @@ impl MyToken {
     setErrors: (errors) => set({ errors }),
     artifacts: null,
     setArtifacts: (artifacts) => set({ artifacts }),
+    logs: [],
+    appendLog: (log) => set((state) => ({ logs: [...state.logs, log] })),
+    clearLogs: () => set({ logs: [] }),
 }));

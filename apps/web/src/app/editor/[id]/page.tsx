@@ -1,11 +1,44 @@
-'use client';
-
 import Link from 'next/link';
 import CodeEditor from '@/components/editor/CodeEditor';
 import { useEditorStore } from '@/stores/editorStore';
+import { useWebSocket } from '@/hooks/useWebSocket';
+import { useCallback } from 'react';
 
 export default function EditorPage({ params }: { params: { id: string } }) {
-    const { status, sourceCode } = useEditorStore();
+    const { status, setStatus, logs, clearLogs, appendLog } = useEditorStore();
+    const { send } = useWebSocket('ws://localhost:8080/ws');
+
+    const handleCompile = useCallback(async () => {
+        clearLogs();
+        setStatus('parsing');
+        appendLog('Initiating compilation...');
+
+        try {
+            const jobId = crypto.randomUUID();
+            const response = await fetch('http://localhost:8080/api/v1/compile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: jobId,
+                    contract_name: 'MyToken',
+                    source: '...', // sourceCode from store should be used here
+                    targets: ['ethereum', 'solana'],
+                    optimization_level: 'optimized'
+                }),
+            });
+
+            if (response.ok) {
+                appendLog(`Job queued: ${jobId}`);
+                send({ action: 'subscribe', job_id: jobId });
+            } else {
+                appendLog('Error: Failed to queue job');
+                setStatus('idle');
+            }
+        } catch (error) {
+            appendLog(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            setStatus('idle');
+        }
+    }, [clearLogs, setStatus, appendLog, send]);
 
     return (
         <div className="h-screen flex flex-col bg-neutral-950 text-white overflow-hidden">
@@ -24,7 +57,11 @@ export default function EditorPage({ params }: { params: { id: string } }) {
                         <span className={`w-2 h-2 rounded-full ${status === 'idle' ? 'bg-neutral-500' : 'bg-orange-500 animate-pulse'}`}></span>
                         {status === 'idle' ? 'Saved' : 'Compiling...'}
                     </span>
-                    <button className="px-4 py-1.5 bg-neutral-800 hover:bg-neutral-700 rounded-lg text-sm font-medium transition-colors border border-neutral-700">
+                    <button
+                        onClick={handleCompile}
+                        disabled={status !== 'idle'}
+                        className="px-4 py-1.5 bg-neutral-800 hover:bg-neutral-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-colors border border-neutral-700"
+                    >
                         Compile
                     </button>
                     <button className="px-5 py-1.5 bg-orange-500 hover:bg-orange-600 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-orange-500/20 active:scale-95">
@@ -86,13 +123,22 @@ export default function EditorPage({ params }: { params: { id: string } }) {
                             </button>
                         </div>
                         <div className="p-4 font-mono text-sm text-neutral-400 overflow-y-auto flex-1">
-                            {status === 'idle' ? (
+                            {logs.length === 0 ? (
                                 <div className="text-neutral-600 italic">Ready to compile. Press Deploy or Compile to see output.</div>
                             ) : (
                                 <div className="space-y-1">
-                                    <div className="text-green-400">✓ Parsing source code...</div>
-                                    <div className="text-green-400">✓ Generating LLVM IR...</div>
-                                    <div className="text-orange-400 animate-pulse">⟳ Running EVM codegen...</div>
+                                    {logs.map((log, i) => (
+                                        <div key={i} className={
+                                            log.includes('✓') || log.includes('successful') ? 'text-green-400' :
+                                                log.includes('Error') ? 'text-red-400' :
+                                                    'text-neutral-300'
+                                        }>
+                                            {log.includes('⟳') ? <span className="animate-pulse inline-block mr-1">{log}</span> : log}
+                                        </div>
+                                    ))}
+                                    {status !== 'idle' && (
+                                        <div className="text-orange-400 animate-pulse">⟳ Running pipeline...</div>
+                                    )}
                                 </div>
                             )}
                         </div>

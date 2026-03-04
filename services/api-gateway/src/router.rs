@@ -12,6 +12,7 @@ pub fn create_router(state: AppState) -> Router {
 
     Router::new()
         .route("/health", get(routes::health::health_check))
+        .route("/ws", get(routes::ws::ws_handler))
         .nest("/api/v1", api_routes())
         .layer(cors)
         .layer(TraceLayer::new_for_http())
